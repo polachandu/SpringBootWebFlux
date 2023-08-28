@@ -23,4 +23,6 @@
 2. Mono
 -----------------------------------------------------------------------------------------
 * Traditional API is a synchronous and blocking
+* In REST API client need to send a request to a controller and controller calls the service class.
+* In Functional Endpoint client need to send a request to Router and Router redirects to corresponding Handler.
 * 

@@ -30,11 +30,18 @@ public class CustomerDao {
                 .collect(Collectors.toList());
     }
 
-    public Flux<Customer> getCustomersFlux() {
+    public Flux<Customer> getCustomersFluxWithDelay() {
         return Flux.range(1,50)
                 .delayElements(Duration.ofSeconds(1))
                 .doOnNext(i ->System.out.println("Processing count: "+i))
-                .map(i -> new Customer(i, "Customer"+i));
+                .map(i -> new Customer(i, "Customer "+i));
+
+    }
+
+    public Flux<Customer> getCustomersFlux() {
+        return Flux.range(1,50)
+                .doOnNext(i ->System.out.println("Processing count: "+i))
+                .map(i -> new Customer(i, "Customer "+i));
 
     }
 }

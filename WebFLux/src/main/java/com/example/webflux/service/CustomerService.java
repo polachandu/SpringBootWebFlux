@@ -24,7 +24,7 @@ public class CustomerService {
 
     public Flux<Customer> getAllCustomersFlux(){
         long start = System.currentTimeMillis();
-        Flux<Customer> customersFlux = dao.getCustomersFlux();
+        Flux<Customer> customersFlux = dao.getCustomersFluxWithDelay();
         long end = System.currentTimeMillis();
         System.out.println("Processing time: "+(end-start));
         return customersFlux;
