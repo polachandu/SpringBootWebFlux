@@ -33,14 +33,14 @@ public class CustomerDao {
     public Flux<Customer> getCustomersFluxWithDelay() {
         return Flux.range(1,50)
                 .delayElements(Duration.ofSeconds(1))
-                .doOnNext(i ->System.out.println("Processing count: "+i))
+                .doOnNext(i ->System.out.println("Processing count in a stream: "+i))
                 .map(i -> new Customer(i, "Customer "+i));
 
     }
 
     public Flux<Customer> getCustomersFlux() {
         return Flux.range(1,50)
-                .doOnNext(i ->System.out.println("Processing count: "+i))
+                .doOnNext(i ->System.out.println("Processing count in a stream: "+i))
                 .map(i -> new Customer(i, "Customer "+i));
 
     }
