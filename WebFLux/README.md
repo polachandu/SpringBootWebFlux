@@ -21,3 +21,6 @@
 * There are two reactor data types
 1. Flux
 2. Mono
+-----------------------------------------------------------------------------------------
+* Traditional API is a synchronous and blocking
+* 
