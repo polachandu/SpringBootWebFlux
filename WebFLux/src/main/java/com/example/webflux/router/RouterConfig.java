@@ -25,6 +25,7 @@ public class RouterConfig {
                 .GET("/router/customers", handler::loadCustomers)
                 .GET("/router/customers/stream", streamHandler::getCustomers)
                 .GET("/router/customer/{input}", streamHandler::findCustomers)
+                .POST("/router/customer/save",streamHandler::saveCustomer)
                 .build();
     }
 }
