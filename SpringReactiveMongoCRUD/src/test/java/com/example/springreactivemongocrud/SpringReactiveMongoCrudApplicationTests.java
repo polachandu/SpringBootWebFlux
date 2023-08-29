@@ -1,13 +1,101 @@
 package com.example.springreactivemongocrud;
 
+import com.example.springreactivemongocrud.controller.ProductController;
+import com.example.springreactivemongocrud.dto.ProductDto;
+import com.example.springreactivemongocrud.service.ProductService;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
-@SpringBootTest
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
+
+@RunWith(SpringRunner.class)
+@WebFluxTest(ProductController.class)
 class SpringReactiveMongoCrudApplicationTests {
 
+    @Autowired
+    private WebTestClient webTestClient;
+
+    @MockBean
+    private ProductService productService;
+
     @Test
-    void contextLoads() {
+    public void addProductTest(){
+        Mono<ProductDto> productDtoMono = Mono.just(new ProductDto("100","mobile","2","4000"));
+        when(productService.saveProduct(productDtoMono)).thenReturn(productDtoMono);
+        webTestClient.post()
+                .uri("/products/save")
+                .body(Mono.just(productDtoMono), ProductDto.class)
+                .exchange()
+                .expectStatus().isOk();
     }
+
+    @Test
+    public void getProductsTest(){
+        Flux<ProductDto> productDtoFlux = Flux.just(new ProductDto("100","mobile","2","4000"),
+                                                new ProductDto("102","mile","2","40"));
+        when(productService.getProducts()).thenReturn(productDtoFlux);
+        Flux<ProductDto> responseBody = webTestClient.get()
+                .uri("/products")
+                .exchange()
+                .expectStatus().isOk()
+                .returnResult(ProductDto.class)
+                .getResponseBody();
+
+        StepVerifier.create(responseBody)
+                .expectSubscription()
+                        .expectNext(new ProductDto("100","mobile","2","4000"))
+                        .expectNext(new ProductDto("102","mile","2","40"))
+                        .verifyComplete();
+    }
+
+    @Test
+    public void getProductTest(){
+        Mono<ProductDto> productDtoMono = Mono.just(new ProductDto("102","mile","2","40"));
+        when(productService.getProduct(any())).thenReturn(productDtoMono);
+        Flux<ProductDto> responseBody = webTestClient.get()
+                .uri("/products/102")
+                .exchange()
+                .expectStatus().isOk()
+                .returnResult(ProductDto.class)
+                .getResponseBody();
+
+        StepVerifier.create(responseBody)
+                .expectSubscription()
+                .expectNextMatches(p -> p.getName().equals("mile"))
+                .verifyComplete();
+    }
+
+    @Test
+    public void updateProduct(){
+        Mono<ProductDto> productDtoMono = Mono.just(new ProductDto("102","mobile","2","4000"));
+        when(productService.updateProduct(productDtoMono,"102")).thenReturn(productDtoMono);
+        webTestClient.put()
+                .uri("/products/update/102")
+                .body(productDtoMono,ProductDto.class)
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Test
+    public void deleteProduct(){
+
+        given(productService.deleteProduct(any())).willReturn(Mono.empty());
+        webTestClient.delete()
+                .uri("/products/delete/102")
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+
 
 }
